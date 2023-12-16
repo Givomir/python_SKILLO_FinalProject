@@ -107,3 +107,17 @@ class MovieDatabase:
             search_results.append(f"-ID {movie[0]} -Title ({movie[1]}) -Description({movie[2]}) -release_year: {movie[3]} -Genre: {movie[4]} -Rating: {movie[5]}")
 
         return search_results
+
+
+    def mark_as_favorite(self, movie_id):
+        """Mark a movie as a favorite."""
+        conn = sqlite3.connect(self.db_file)
+        cursor = conn.cursor()
+
+        # Update the favorite status of the movie
+        cursor.execute('''
+           UPDATE movies SET favorite = favorite + 1 WHERE ID = ?
+        ''', (movie_id,))
+
+        conn.commit()
+        conn.close()

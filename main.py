@@ -49,11 +49,20 @@ def movsrch(query):
         click.echo(f"No movies found with title containing '{query}'.")
 
 
+@click.command()
+@click.argument("movie_id")
+def movfv(movie_id):
+    """Mark a movie as a favorite."""
+    movie_db.mark_as_favorite(movie_id)
+    click.echo(f"Movie with ID {movie_id} marked as a favorite.")
+
+
 # Add the  command to the CLI
 cli.add_command(movadd)
 cli.add_command(movlst)
 cli.add_command(movdt)
 cli.add_command(movsrch)
+cli.add_command(movfv)
 
 if __name__ == "__main__":
     movie_db = MovieDatabase("movie_database.db")
