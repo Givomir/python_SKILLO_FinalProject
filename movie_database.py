@@ -58,7 +58,7 @@ class MovieDatabase:
         conn.close()
 
         for movie in movies:
-            print(f"{movie[0]} ({movie[1]}) -description: {movie[2]}, Release Year: {movie[3]}, - Genre: {movie[4]}, Rating: {movie[5]}, favorite: {movie[6]}")
+            print(f"ID:{movie[0]} Title:{movie[1]} -Description: {movie[2]}, Release Year: {movie[3]}, - Genre: {movie[4]}, Rating: {movie[5]}, Favorite: {movie[6]}")
 
 
     def get_movie_by_id(self, movie_id):
@@ -73,9 +73,11 @@ class MovieDatabase:
             return {
                 'ID': movie_data[0],
                 'title': movie_data[1],
-                'release_year': movie_data[2],
-                'genre': movie_data[3],
-                'rating': movie_data[4]
+                'description': movie_data[2],
+                'release_year': movie_data[3],
+                'genre': movie_data[4],
+                'rating': movie_data[5],
+                'favorite': movie_data[6]
                 # Add more fields as needed
             }
         else:
@@ -121,3 +123,46 @@ class MovieDatabase:
 
         conn.commit()
         conn.close()
+
+    def get_top_movies(self, category, limit=5):
+        """Get the top movies based on the specified category."""
+        conn = sqlite3.connect(self.db_file)
+        cursor = conn.cursor()
+
+        if category == 'liked':
+            cursor.execute('''
+                SELECT ID, title, Description, release_year, genre, rating, favorite 
+                FROM movies
+                ORDER BY favorite DESC
+                LIMIT ?
+            ''', (limit,))
+        elif category == 'newest':
+            cursor.execute('''
+                SELECT ID, title, Description, release_year, genre, rating, favorite
+                FROM movies
+                ORDER BY release_year DESC
+                LIMIT ?
+            ''', (limit,))
+        elif category == 'genre':
+            genre = input("Enter the genre: ")  # You can modify this to accept user input
+            cursor.execute('''
+                SELECT ID, title, Description, release_year, genre, rating, favorite 
+                FROM movies
+                WHERE genre = ?
+                ORDER BY rating DESC
+                LIMIT ?
+            ''', (genre, limit))
+        else:
+            conn.close()
+            return None
+
+        movies = cursor.fetchall()
+        conn.close()
+
+        top_movies = []
+        for movie in movies:
+            top_movies.append(
+                f"-ID {movie[0]} -Title ({movie[1]}) -Description({movie[2]}) -release_year: {movie[3]} -Genre: {movie[4]} -Rating: {movie[5]} -Favorite: {movie[6]}"
+            )
+
+        return top_movies
